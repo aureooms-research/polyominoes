@@ -3,23 +3,26 @@ from filter import filter_one_sided
 from filter import filter_free
 from filter import filter_without_holes
 from filter import _filter_with_odd_side_lengths
+from online import links
 
 FMT = {
     'csv': {
         'sep': ', ',
-        'title': ':>20',
-        'entry': ':>20',
+        'title': ':>18',
+        'entry': ':>18',
         'newline': '',
         'endline': '',
         'hline': '',
+        'linkify': False,
     },
     'md': {
         'sep': ' | ',
-        'title': ':>20',
-        'entry': ':>20',
+        'title': ':>46',
+        'entry': ':>46',
         'newline': '| ',
         'endline': ' |',
-        'hline': ':-^20',
+        'hline': ':-^46',
+        'linkify': True,
     },
 }
 
@@ -47,15 +50,19 @@ def main (
         format_newline=CSV['newline'],
         format_endline=CSV['endline'],
         format_hline=CSV['hline'],
+        format_linkify=CSV['linkify'],
         **options
     ) :
 
     ncols = len(columns)
 
-    cols = frozenset(columns)
+    if format_linkify:
+        titles = list(map(lambda column: column if column not in links else '[{}]({})'.format(column, links[column]), columns))
+    else:
+        titles = columns
 
     HEADER_FMT = format_newline + format_sep.join(['{'+format_title+'}']*ncols) + format_endline
-    header = HEADER_FMT.format(*columns)
+    header = HEADER_FMT.format(*titles)
     print(header)
 
     if format_hline:
@@ -119,6 +126,7 @@ if __name__ == '__main__':
     parser.add_argument('--format-newline', help='newline for table format')
     parser.add_argument('--format-endline', help='endline for table format')
     parser.add_argument('--format-hline', help='hline filler for table format')
+    parser.add_argument('--format-linkify', type=bool, help='enable links in table header')
 
     parser.add_argument('--columns', nargs='+', default=COLUMNS, choices=COLUMNS, help='columns of the table')
 
