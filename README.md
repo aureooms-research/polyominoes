@@ -26,3 +26,9 @@ pypy3 count.py 13 -f csv
   |                   11 |               135268 |                33896 |                17073 |                16094 |                  144 |
   |                   12 |               505861 |               126759 |                63600 |                58937 |                  335 |
   |                   13 |              1903890 |               476270 |               238591 |               217117 |                  710 |
+
+
+## Credits
+
+The code was originally derived from
+[tesseralis/polyomino](https://github.com/tesseralis/polyomino).
