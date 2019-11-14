@@ -19,9 +19,11 @@ def mino_key(m):
 
 ##@total_ordering
 class Polyomino(frozenset):
+
     """
-    Represent a fixed polyomino in space as a set of point tuples.
+        Represent a fixed polyomino in space as a set of point tuples.
     """
+
     def grid(self):
         """Return boolean-grid representation of this polyomino."""
         # Create a blank grid in the shape of the mino
