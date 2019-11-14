@@ -11,7 +11,7 @@ Enumeration of Polyominoes
 pypy3 count.py 13 -f csv
 ```
 
-  |                                          order |               [fixed](https://oeis.org/A00168) |          [one-sided](https://oeis.org/A000988) |               [free](https://oeis.org/A000105) | [free without holes](https://oeis.org/A000104) |            [A217595](https://oeis.org/A217595) |
+  |                                          order |               [fixed](https://oeis.org/A001168) |          [one-sided](https://oeis.org/A000988) |               [free](https://oeis.org/A000105) | [free without holes](https://oeis.org/A000104) |            [A217595](https://oeis.org/A217595) |
   | ---------------------------------------------- | ---------------------------------------------- | ---------------------------------------------- | ---------------------------------------------- | ---------------------------------------------- | ---------------------------------------------- |
   |                                              1 |                                              1 |                                              1 |                                              1 |                                              1 |                                              1 |
   |                                              2 |                                              2 |                                              1 |                                              1 |                                              1 |                                              0 |
