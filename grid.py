@@ -31,9 +31,15 @@ def _neighbors_from_direction(neighbor, cell):
         yield (i-1, j)
 
 def _neighbors(cell):
+
     """
     Get upper, right, lower, left neighbors of this cell, in that order.
+
+    >>> list(_neighbors((7,5)))
+    [(7, 6), (8, 5), (7, 4), (6, 5)]
+
     """
+
     i, j = cell
     yield (i, j+1)
     yield (i+1, j)
@@ -41,9 +47,15 @@ def _neighbors(cell):
     yield (i-1, j)
 
 def neighbors(cell):
+
     """
     Get neighbors of this cell in no specific order.
+
+    >>> sorted(neighbors((7,5)))
+    [(6, 5), (7, 4), (7, 6), (8, 5)]
+
     """
+
     return frozenset(_neighbors(cell))
 
 def is_connected ( cells ) :
