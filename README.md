@@ -8,5 +8,5 @@ Enumeration of Polyominoes
 [![GitHub issues](https://img.shields.io/github/issues/aureooms-research/polyominoes.svg)](https://github.com/aureooms-research/polyominoes/issues)
 
 ```py
-pypy3 count.py 13
+pypy3 count.py 13 -f csv
 ```
