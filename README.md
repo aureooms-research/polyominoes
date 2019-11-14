@@ -4,5 +4,5 @@ Enumeration of Polyominoes
 > ENUMARETE DAZ LATTICE ANIMALZ
 
 ```py
-pypy3 enumerate.py 13
+pypy3 count.py 13
 ```
