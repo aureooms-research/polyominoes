@@ -58,10 +58,10 @@ def _filter_without_holes ( minos ) :
         if is_connected(antimino): yield mino
 
 def filter_without_holes ( minos ) :
-    return frozenset(_filter_without_holes(minos))
+    return list(_filter_without_holes(minos))
 
 def filter_with_holes ( minos ) :
-    return minos - filter_without_holes(minos)
+    return minos.difference(filter_without_holes(minos))
 
 def _filter_with_odd_side_lengths ( minos ):
 
@@ -92,7 +92,7 @@ def _filter_with_odd_side_lengths ( minos ):
         debug('#####################################')
 
 def filter_with_odd_side_lengths ( minos ):
-    return frozenset(_filter_with_odd_side_lengths(minos))
+    return list(_filter_with_odd_side_lengths(minos))
 
 def boundary ( mino ):
 
