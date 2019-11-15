@@ -17,23 +17,19 @@ def childset(minos):
     return children
 
 
-def _fixed(n):
+def _fixed():
 
     """
-        Enumerate the fixed k-ominoes for 1 <= k <= n.
+        Enumerate the fixed k-ominoes for all k >= 1.
     """
-
-    if n <= 0:
-        return
 
     # The one monomino
     minos = {Polyomino([(0,0)])}
-    yield minos
 
     # Iteratively add the children of the members of the set before it
-    for k in range(n-1):
-        minos = childset(minos)
+    while True:
         yield minos
+        minos = childset(minos)
 
 def fixed(n):
 
@@ -45,8 +41,10 @@ def fixed(n):
 
     """
 
-    for minos in _fixed(n):
-        pass
+    it = _fixed()
+
+    for i in range(n):
+        minos = next(it)
 
     return minos
 
