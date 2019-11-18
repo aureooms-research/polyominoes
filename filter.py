@@ -110,11 +110,3 @@ def _filter_with_odd_side_lengths ( minos ):
 
 def filter_with_odd_side_lengths ( minos ):
     return list(_filter_with_odd_side_lengths(minos))
-
-filters = {
-    'one-sided': _filter_one_sided,
-    'free': _filter_free,
-    'chiral': _filter_chiral,
-    'free without holes': _filter_without_holes,
-    'A217595': _filter_with_odd_side_lengths,
-}

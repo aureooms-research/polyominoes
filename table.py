@@ -5,33 +5,11 @@ from debug import debug
 
 from enumerate import _fixed_with_offset
 from enumerate import _redelmeier
-from filter import filters
+from dependencies import filters
+from dependencies import targets
 from count import cardinality
 from online import links
 from scheduling import needed
-
-FMT = {
-    'csv': {
-        'sep': ', ',
-        'title': ':>18',
-        'entry': ':>18',
-        'newline': '',
-        'endline': '',
-        'hline': '',
-        'linkify': False,
-    },
-    'md': {
-        'sep': ' | ',
-        'title': ':>46',
-        'entry': ':>46',
-        'newline': '| ',
-        'endline': ' |',
-        'hline': ':-^46',
-        'linkify': True,
-    },
-}
-
-CSV = FMT['csv']
 
 COLUMNS = (
     "order",
@@ -40,18 +18,46 @@ COLUMNS = (
     "free",
     "chiral",
     "free without holes",
-    "A217595"
+    "fixed without holes",
+    "A217595",
+    "A217595 fixed",
+    "A217595 mem",
 )
 
-TARGETS = {
-    'order': [],
-    'fixed': [],
-    'one-sided': ['fixed'],
-    'free': ['fixed'],
-    'chiral': ['free'],
-    'free without holes': ['free'],
-    'A217595': ['free without holes'],
+LONGEST_COLUMN_TITLE = max(map(len, COLUMNS))
+
+FMT = {
+    'csv': {
+        'sep': ', ',
+        'title': ':>{}'.format(LONGEST_COLUMN_TITLE),
+        'entry': ':>{}'.format(LONGEST_COLUMN_TITLE),
+        'newline': '',
+        'endline': '',
+        'hline': '',
+        'linkify': False,
+    },
+    'md': {
+        'sep': ' | ',
+        'title': ':>{}'.format(LONGEST_COLUMN_TITLE+28),
+        'entry': ':>{}'.format(LONGEST_COLUMN_TITLE+28),
+        'newline': '| ',
+        'endline': ' |',
+        'hline': ':-^{}'.format(LONGEST_COLUMN_TITLE+28),
+        'linkify': True,
+    },
 }
+
+CSV = FMT['csv']
+
+DEFAULT_COLUMNS = (
+    "order",
+    "fixed",
+    "one-sided",
+    "free",
+    "chiral",
+    "free without holes",
+    "A217595",
+)
 
 def put ( x ) :
     print(x, end='', flush=True)
@@ -59,7 +65,7 @@ def put ( x ) :
 def main (
         min_order=0 ,
         max_order=None ,
-        columns=COLUMNS,
+        columns=DEFAULT_COLUMNS,
         format_sep=CSV['sep'],
         format_title=CSV['title'],
         format_entry=CSV['entry'],
@@ -72,12 +78,12 @@ def main (
     ) :
 
     wanted = frozenset(columns)
-    tocompute = needed(TARGETS, columns)
+    tocompute = needed(targets, columns)
     debug('tocompute', tocompute)
 
     if show_intermediate:
         wanted = frozenset(tocompute.keys())
-        tocompute = needed(TARGETS, wanted)
+        tocompute = needed(targets, wanted)
         columns = list(filter(wanted.__contains__, COLUMNS))
 
     ncols = len(columns)
@@ -137,7 +143,7 @@ def entries(min_order, max_order, wanted, tocompute):
     _cache = {}
 
     def default_iter ( ) :
-        return lambda key: filters[key](*(_cache[dep] for dep in TARGETS[key]))
+        return lambda key: filters[key](*(_cache[dep] for dep in targets[key]))
 
     compute_iter = defaultdict(default_iter, {
         'order': lambda key: i,
@@ -205,7 +211,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--show-intermediate', action='store_true', help='also print columns for intermediate computations')
 
-    parser.add_argument('--columns', nargs='+', default=COLUMNS, choices=COLUMNS, help='columns of the table')
+    parser.add_argument('--columns', nargs='+', default=DEFAULT_COLUMNS, choices=COLUMNS, help='columns of the table')
 
     args = parser.parse_args()
     arguments = vars(args)
