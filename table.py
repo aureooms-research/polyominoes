@@ -4,6 +4,7 @@ from collections import defaultdict
 from debug import debug
 
 from enumerate import _fixed_with_offset
+from enumerate import _redelmeier
 from filter import filters
 from count import cardinality
 from online import links
@@ -100,7 +101,7 @@ def main (
 
     # entries
 
-    events = entries(min_order, wanted, tocompute)
+    events = entries(min_order, max_order, wanted, tocompute)
 
     _cache = {}
 
@@ -129,9 +130,9 @@ def main (
         put(format_endline)
         put('\n')
 
-def entries(offset, wanted, tocompute):
+def entries(min_order, max_order, wanted, tocompute):
 
-    it = _fixed_with_offset(offset)
+    it = _fixed_with_offset(min_order)
 
     _cache = {}
 
@@ -140,7 +141,7 @@ def entries(offset, wanted, tocompute):
 
     compute_iter = defaultdict(default_iter, {
         'order': lambda key: i,
-        'fixed': lambda key: next(it),
+        'fixed': lambda key: next(it) if max_order is not None and max_order > min_order else _redelmeier(i),
     })
 
 
@@ -158,7 +159,7 @@ def entries(offset, wanted, tocompute):
         'order': lambda key: _cache[key],
     })
 
-    for i in count(offset):
+    for i in count(min_order):
 
         for target in COLUMNS:
 
