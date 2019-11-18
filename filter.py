@@ -127,10 +127,7 @@ def boundary ( mino ):
 
     n = len(mino)
 
-    for i in range(n):
-        if (0,i) in mino:
-            first = (0,i)
-            break
+    first = mino.origin
 
     debug("first", first)
 
