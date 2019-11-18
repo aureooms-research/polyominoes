@@ -70,17 +70,15 @@ def _neighbors_from_direction(neighbor, cell):
 
 def is_connected ( cells ) :
 
+    it = iter(cells)
+
     try:
-        first = next(iter(cells))
+        first = next(it)
     except StopIteration:
         return True
 
-    todo = set(cells)
-    queue = []
-
-    todo.discard(first) # discard handles the case where cells is an iterator
-    queue.append(first)
-
+    todo = set(it)
+    queue = [first]
 
     while queue:
 
@@ -92,7 +90,7 @@ def is_connected ( cells ) :
                 todo.remove(neighbor)
                 queue.append(neighbor)
 
-    return len(todo) == 0
+    return not todo
 
 
 def boundary_cells ( mino ):
