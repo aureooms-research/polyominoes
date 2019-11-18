@@ -1,10 +1,10 @@
 from itertools import count
+from collections import defaultdict
+
+from debug import debug
+
 from enumerate import _fixed
-from filter import filter_chiral
-from filter import filter_one_sided
-from filter import filter_free
-from filter import filter_without_holes
-from filter import _filter_with_odd_side_lengths
+from filter import filters
 from count import cardinality
 from online import links
 from scheduling import needed
@@ -46,8 +46,8 @@ TARGETS = {
     'order': [],
     'fixed': [],
     'one-sided': ['fixed'],
-    'chiral': ['free'],
     'free': ['fixed'],
+    'chiral': ['free'],
     'free without holes': ['free'],
     'A217595': ['free without holes'],
 }
@@ -120,53 +120,51 @@ def entries(n, wanted):
 
     tocompute = needed(TARGETS, wanted)
 
+    debug('tocompute', tocompute)
+
     it = _fixed()
+
+    # use defaultdict for default answer
+
+    _cache = {}
+
+    def default_iter ( ) :
+        return lambda key: filters[key](*(_cache[dep] for dep in TARGETS[key]))
+
+    compute_iter = defaultdict(default_iter, {
+        'order': lambda key: i,
+        'fixed': lambda key: next(it),
+    })
+
+
+    def default_list ( ) :
+        return lambda key: list(compute_iter[key](key))
+
+    compute_list = defaultdict(default_list, {
+        'order': lambda key: i,
+    })
+
+    def default_counter ( ) :
+        return lambda key: cardinality(_cache[key])
+
+    compute_count = defaultdict(default_counter, {
+        'order': lambda key: _cache[key],
+    })
 
     for i in count(1):
 
-        if 'order' in wanted:
-            yield (i, 'order', i)
+        for target in COLUMNS:
 
-        if 'fixed' in tocompute:
-            fixed_set = next(it)
+            if target in tocompute:
 
-            if 'fixed' in wanted:
-                fixed_len = len(fixed_set)
-                yield (i, 'fixed', fixed_len)
+                if tocompute[target] == 1:
+                    _cache[target] = compute_iter[target](target)
 
-        if 'one-sided' in tocompute:
-            one_sided_set = filter_one_sided(fixed_set)
+                else:
+                    _cache[target] = compute_list[target](target)
 
-            if 'one-sided' in wanted:
-                one_sided_len = len(one_sided_set)
-                yield (i, 'one-sided', one_sided_len)
-
-        if 'free' in tocompute:
-            free_set = filter_free(fixed_set)
-
-            if 'free' in wanted:
-                free_len = len(free_set)
-                yield (i, 'free', free_len)
-
-        if 'chiral' in tocompute:
-            chiral_set = filter_chiral(free_set)
-
-            if 'chiral' in wanted:
-                chiral_len = len(chiral_set)
-                yield (i, 'chiral', chiral_len)
-
-        if 'free without holes' in tocompute:
-            free_without_holes_set = filter_without_holes(free_set)
-
-            if 'free without holes' in wanted:
-                free_without_holes_len = len(free_without_holes_set)
-                yield (i, 'free without holes', free_without_holes_len)
-
-        if 'A217595' in tocompute:
-            A217595_set = _filter_with_odd_side_lengths(free_without_holes_set)
-            if 'A217595' in wanted:
-                A217595_len = cardinality(A217595_set)
-                yield(i, 'A217595', A217595_len)
+                if target in wanted:
+                    yield (i, target, compute_count[target](target))
 
 if __name__ == '__main__':
 

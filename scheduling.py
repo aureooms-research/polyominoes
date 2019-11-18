@@ -1,13 +1,14 @@
+from collections import Counter
 
 def expand ( targets ) :
 
     def _deps ( dependencies, key ) :
         if key not in dependencies:
-            deps = frozenset()
+            deps = Counter()
             for target in targets[key]:
-                deps = deps.union(_deps(dependencies, target))
+                deps.update(_deps(dependencies, target))
             dependencies[key] = deps
-        return dependencies[key].union([key])
+        return Counter([key]) | dependencies[key]
 
     dependencies = {}
 
@@ -19,4 +20,10 @@ def needed ( targets, wanted ):
 
     dependencies = expand(targets)
 
-    return wanted.union(*(dependencies[target] for target in wanted))
+    cnt = Counter(wanted)
+
+    for target in wanted:
+
+        cnt.update(dependencies[target])
+
+    return cnt

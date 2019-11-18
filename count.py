@@ -1,7 +1,11 @@
 import enumerate
 
 def cardinality ( iterable ) :
-    return sum(map(lambda x: 1, iterable))
+
+    try:
+        return len(iterable)
+    except TypeError:
+        return sum(map(lambda x: 1, iterable))
 
 
 def fixed(n):

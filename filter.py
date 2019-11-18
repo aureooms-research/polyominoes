@@ -18,14 +18,13 @@ def _filter_chiral(minos):
 def filter_chiral(minos):
     return list(_filter_chiral(minos))
 
-def filter_one_sided(minos, sort=True):
+def _filter_one_sided(minos, sort=True):
 
     """
         Remove rotations in set of minos.
     """
 
     vis = set() # visited mino rotation families
-    result = set()
     for mino in minos:
         # If we haven't seen a rotation of this mino before,
         # add its rotations to the visisted list
@@ -33,13 +32,14 @@ def filter_one_sided(minos, sort=True):
             mino_rots = mino.rotations()
             vis.update(mino_rots)
             # Add the (maximal rotation of the) mino
-            result.add(max(mino_rots, key=mino_key) if sort else mino)
-    return result
+            yield max(mino_rots, key=mino_key) if sort else mino
 
-def filter_free(minos, sort=True):
+def filter_one_sided(minos, sort=True):
+    return list(_filter_one_sided(minos,sort=sort))
+
+def _filter_free(minos, sort=True):
     """Remove rotations and reflections in the set of minos."""
     vis = set() # visited transformation families
-    result = set()
     for mino in minos:
         # If we haven't seen a rotation or reflection of this mino before,
         # add its transforms to the visisted list
@@ -47,8 +47,10 @@ def filter_free(minos, sort=True):
             mino_trans = mino.transforms()
             vis.update(mino_trans)
             # Add the (maximal transform of the) mino
-            result.add(max(mino_trans, key=mino_key) if sort else mino)
-    return result
+            yield max(mino_trans, key=mino_key) if sort else mino
+
+def filter_free(minos, sort=True):
+    return frozenset(_filter_free(minos,sort=sort))
 
 
 def _filter_without_holes ( minos ) :
@@ -68,7 +70,10 @@ def _filter_without_holes ( minos ) :
         if is_connected(antimino): yield mino
 
 def filter_without_holes ( minos ) :
-    return list(_filter_without_holes(minos))
+    return frozenset(_filter_without_holes(minos))
+
+def _filter_with_holes ( minos ) :
+    yield from filter_with_holes( minos )
 
 def filter_with_holes ( minos ) :
     return minos.difference(filter_without_holes(minos))
@@ -185,3 +190,11 @@ def _boundary_lengths ( c ) :
 
     for p, q in zip(c, c[1:] + c[:1]):
         yield max(abs(p[0]-q[0]), abs(p[1]-q[1]))
+
+filters = {
+    'one-sided': _filter_one_sided,
+    'free': _filter_free,
+    'chiral': _filter_chiral,
+    'free without holes': _filter_without_holes,
+    'A217595': _filter_with_odd_side_lengths,
+}
