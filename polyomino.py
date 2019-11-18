@@ -77,7 +77,7 @@ class Polyomino(frozenset):
 
     @property
     def origin(self):
-        for i in range(n):
+        for i in range(len(self)):
             if (0,i) in self:
                 return (0,i)
 
