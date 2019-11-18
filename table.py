@@ -3,7 +3,7 @@ from collections import defaultdict
 
 from debug import debug
 
-from enumerate import _fixed
+from enumerate import _fixed_with_offset
 from filter import filters
 from count import cardinality
 from online import links
@@ -100,7 +100,7 @@ def main (
 
     # entries
 
-    events = entries(wanted, tocompute)
+    events = entries(min_order, wanted, tocompute)
 
     _cache = {}
 
@@ -129,9 +129,9 @@ def main (
         put(format_endline)
         put('\n')
 
-def entries(wanted, tocompute):
+def entries(offset, wanted, tocompute):
 
-    it = _fixed()
+    it = _fixed_with_offset(offset)
 
     _cache = {}
 
@@ -158,7 +158,7 @@ def entries(wanted, tocompute):
         'order': lambda key: _cache[key],
     })
 
-    for i in count(0):
+    for i in count(offset):
 
         for target in COLUMNS:
 

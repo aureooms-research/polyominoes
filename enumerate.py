@@ -5,6 +5,36 @@ from filter import filter_chiral
 from filter import filter_with_holes
 from filter import filter_without_holes
 from filter import filter_with_odd_side_lengths
+from grid import neighbors
+
+def _redelmeier_routine(p, parent, untried, forbidden):
+
+    # todo use lifo linked list / stack implementation for untried
+
+    if p == 0:
+        yield parent.normalize()
+
+    else:
+
+        while untried:
+
+            nbr = untried.pop()
+
+            child = Polyomino(parent | {nbr})
+
+            new_neighbours = list(filter(
+                    lambda x : x not in parent and x not in forbidden and ((x[1] >= 0 and x[0] >= 0) or x[1] >= 1),
+                    neighbors(nbr).difference(untried)
+            ))
+
+            forbidden = forbidden.union([nbr])
+
+            yield from _redelmeier_routine(p-1, child, untried + new_neighbours, forbidden)
+
+def _redelmeier(p):
+
+    yield from _redelmeier_routine(p, Polyomino([]), [(0,0)], frozenset())
+
 
 def childset(minos):
 
@@ -17,22 +47,34 @@ def childset(minos):
         children.update(mino.children())
     return children
 
+def _fixed_with_offset(offset):
 
-# def _redelmeier():
+    init = fixed(offset)
+    yield from _fixed_with_init(init)
 
-def _fixed():
-
-    """
-        Enumerate the fixed k-ominoes for all k >= 0.
-    """
-
-    # The one zeromino
-    minos = {Polyomino([])}
+def _fixed_with_init(minos):
 
     # Iteratively add the children of the members of the set before it
     while True:
         yield minos
         minos = childset(minos)
+
+def _fixed():
+
+    """
+        Enumerate the fixed k-ominoes for all k >= 0.
+
+        >>> from oeis import A001168
+        >>> it = _fixed()
+        >>> all(map(lambda n: len(next(it)) == A001168[n], range(8)))
+        True
+
+    """
+
+    # The one zeromino
+    init = {Polyomino([])}
+
+    yield from _fixed_with_init(init)
 
 def fixed(n):
 
@@ -44,12 +86,7 @@ def fixed(n):
 
     """
 
-    it = _fixed()
-
-    for i in range(n+1):
-        minos = next(it)
-
-    return minos
+    return frozenset(_redelmeier(n))
 
 def free(n):
 

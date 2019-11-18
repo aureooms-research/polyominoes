@@ -12,13 +12,15 @@ def fixed(n):
 
     """
 
+        >>> fixed(9)
+        9910
         >>> from oeis import A001168
         >>> all(map(lambda n: fixed(n) == A001168[n], range(10)))
         True
 
     """
 
-    return len(enumerate.fixed(n))
+    return cardinality(enumerate._redelmeier(n))
 
 def free(n):
 
