@@ -7,7 +7,7 @@ Enumeration of Polyominoes
 [![Build](https://img.shields.io/travis/aureooms-research/polyominoes/master.svg)](https://travis-ci.org/aureooms-research/polyominoes/branches)
 [![GitHub issues](https://img.shields.io/github/issues/aureooms-research/polyominoes.svg)](https://github.com/aureooms-research/polyominoes/issues)
 
-```py
+```sh
 pypy3 table.py --format md --max-order 13
 ```
 
