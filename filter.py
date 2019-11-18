@@ -61,9 +61,9 @@ def _filter_without_holes ( minos ) :
 
     for mino in minos:
 
-        n = len(mino)
+        h, w = mino.shape
 
-        whole_grid = set((x,y) for x in range(-1,n+2) for y in range(-1,n+2))
+        whole_grid = set((x,y) for x in range(-1,h+1) for y in range(-1,w+1))
 
         antimino = whole_grid - mino
 
