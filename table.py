@@ -102,9 +102,9 @@ def main (
 
         return _cache[(order, kind)]
 
-    for i in range(n):
+    for i in range(n+1):
 
-        order = i+1
+        order = i
 
         put(format_newline)
 
@@ -151,7 +151,7 @@ def entries(n, wanted):
         'order': lambda key: _cache[key],
     })
 
-    for i in count(1):
+    for i in count(0):
 
         for target in COLUMNS:
 

@@ -15,7 +15,7 @@ def mino_key(m):
     """
     #Sort the mino by order, then shape, then 'closeness to top'
     h, w = m.shape
-    return (len(m), h/w, sum(2**(i+j*w) for i, j in m))
+    return (len(m), h, w, sum(2**(i+j*w) for i, j in m))
 
 ##@total_ordering
 class Polyomino(frozenset):
@@ -59,8 +59,11 @@ class Polyomino(frozenset):
     @property
     def shape(self):
         """Width and height of a mino"""
-        rows, cols = zip(*self)
-        return -min(rows)+max(rows)+1, -min(rows)+max(cols)+1
+        if self:
+            rows, cols = zip(*self)
+            return -min(rows)+max(rows)+1, -min(rows)+max(cols)+1
+        else:
+            return (0,0)
     @property
     def width(self):
         return self.shape[1]
@@ -69,12 +72,17 @@ class Polyomino(frozenset):
         return self.shape[0]
 
     # [transformations]
+    def corner(self):
+        if not self:
+            return (0,0)
+        rows, cols = zip(*self)
+        return (min(rows), min(cols))
+
     def normalize(self):
         """
         Return a polyomino in normal form (min x,y is zero)
         """
-        rows, cols = zip(*self)
-        imin, jmin = min(rows), min(cols)
+        imin, jmin = self.corner()
         return self.translate(-imin, -jmin)
 
     def translate(self, numrows, numcols):
@@ -174,6 +182,9 @@ class Polyomino(frozenset):
         """
         Returns all polyominoes obtained by adding a square to this one.
         """
+        if not self:
+            return frozenset([Polyomino([(0,0)])])
+
         childset = set()
         # Get all the neighbors of all the cells
         nbrs = set()

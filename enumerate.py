@@ -21,11 +21,11 @@ def childset(minos):
 def _fixed():
 
     """
-        Enumerate the fixed k-ominoes for all k >= 1.
+        Enumerate the fixed k-ominoes for all k >= 0.
     """
 
-    # The one monomino
-    minos = {Polyomino([(0,0)])}
+    # The one zeromino
+    minos = {Polyomino([])}
 
     # Iteratively add the children of the members of the set before it
     while True:
@@ -37,14 +37,14 @@ def fixed(n):
     """
 
         >>> from oeis import A001168
-        >>> all(map(lambda n: len(fixed(n)) == A001168[n], range(1,8)))
+        >>> all(map(lambda n: len(fixed(n)) == A001168[n], range(8)))
         True
 
     """
 
     it = _fixed()
 
-    for i in range(n):
+    for i in range(n+1):
         minos = next(it)
 
     return minos
@@ -54,7 +54,7 @@ def free(n):
     """
 
         >>> from oeis import A000105
-        >>> all(map(lambda n: len(free(n)) == A000105[n], range(1,8)))
+        >>> all(map(lambda n: len(free(n)) == A000105[n], range(8)))
         True
 
     """
@@ -66,7 +66,7 @@ def one_sided(n):
     """
 
         >>> from oeis import A000988
-        >>> all(map(lambda n: len(one_sided(n)) == A000988[n], range(1,8)))
+        >>> all(map(lambda n: len(one_sided(n)) == A000988[n], range(8)))
         True
 
     """
@@ -78,7 +78,7 @@ def chiral(n):
     """
 
         >>> from oeis import A030228
-        >>> all(map(lambda n: len(chiral(n)) == A030228[n], range(1,8)))
+        >>> all(map(lambda n: len(chiral(n)) == A030228[n], range(8)))
         True
 
         For a(4)=2, the two chiral tetrominoes are XXX and XX .
@@ -93,7 +93,7 @@ def with_holes(n):
     """
 
         >>> from oeis import A001419
-        >>> all(map(lambda n: len(with_holes(n)) == A001419[n], range(1,8)))
+        >>> all(map(lambda n: len(with_holes(n)) == A001419[n], range(8)))
         True
 
     """
@@ -105,7 +105,7 @@ def without_holes(n):
     """
 
         >>> from oeis import A000104
-        >>> all(map(lambda n: len(without_holes(n)) == A000104[n], range(1,8)))
+        >>> all(map(lambda n: len(without_holes(n)) == A000104[n], range(8)))
         True
 
     """
@@ -118,7 +118,7 @@ def free_without_holes_with_odd_side_length(n):
     """
 
         >>> from oeis import A217595
-        >>> all(map(lambda n: len(free_without_holes_with_odd_side_length(n)) == A217595[n], range(1,8)))
+        >>> all(map(lambda n: len(free_without_holes_with_odd_side_length(n)) == A217595[n], range(8)))
         True
 
     """
