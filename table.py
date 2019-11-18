@@ -201,7 +201,7 @@ if __name__ == '__main__':
     parser.add_argument('--format-newline', help='newline for table format')
     parser.add_argument('--format-endline', help='endline for table format')
     parser.add_argument('--format-hline', help='hline filler for table format')
-    parser.add_argument('--format-linkify', action='store_true', help='enable links in table header')
+    parser.add_argument('--format-linkify', type=bool, help='enable links in table header')
 
     parser.add_argument('--show-intermediate', action='store_true', help='also print columns for intermediate computations')
 
