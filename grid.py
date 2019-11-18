@@ -131,16 +131,14 @@ def boundary ( mino ):
 
     debug("first", first)
 
-    boundary = []
-
     # those are coordinates of the lattice
 
     previous = first
     if (first[0],first[1]+1) in mino:
-        boundary.append((first[0],first[1]+1))
+        boundary = [(first[0],first[1]+1)]
         second = (first[0],first[1]+1)
     else:
-        boundary.append((first[0]+1,first[1]+1))
+        boundary = [(first[0]+1,first[1]+1)]
         second = (first[0]+1,first[1])
 
     current = second
@@ -167,11 +165,10 @@ def boundary ( mino ):
                 current = neighbor
                 break
 
-        if current == second and previous == first: break
+        if current == second and previous == first:
+            boundary.pop()
+            return boundary
 
-    boundary.pop()
-
-    return boundary
 
 def _corners ( b ) :
 
