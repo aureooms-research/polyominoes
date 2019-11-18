@@ -56,7 +56,8 @@ def put ( x ) :
     print(x, end='', flush=True)
 
 def main (
-        n ,
+        min_order=0 ,
+        max_order=None ,
         columns=COLUMNS,
         format_sep=CSV['sep'],
         format_title=CSV['title'],
@@ -79,9 +80,10 @@ def main (
 
     # header
 
-    HEADER_FMT = format_newline + format_sep.join(['{'+format_title+'}']*ncols) + format_endline
-    header = HEADER_FMT.format(*titles)
-    print(header)
+    if format_title:
+        HEADER_FMT = format_newline + format_sep.join(['{'+format_title+'}']*ncols) + format_endline
+        header = HEADER_FMT.format(*titles)
+        print(header)
 
     if format_hline:
         HLINE_FMT  = format_newline + format_sep.join(['{'+format_hline+'}']*ncols) + format_endline
@@ -90,7 +92,7 @@ def main (
 
     # entries
 
-    events = entries(n, wanted)
+    events = entries(wanted)
 
     _cache = {}
 
@@ -102,21 +104,24 @@ def main (
 
         return _cache[(order, kind)]
 
-    for i in range(n+1):
+    if max_order is None:
+        orders = count(min_order)
+    else:
+        orders = range(min_order, max_order+1)
 
-        order = i
+    for order in orders:
 
         put(format_newline)
 
         for j, kind in enumerate(columns):
             if j > 0: put(format_sep)
-            count = retrieve(order, kind)
-            put(('{'+format_entry+'}').format(count))
+            value = retrieve(order, kind)
+            put(('{'+format_entry+'}').format(value))
 
         put(format_endline)
         put('\n')
 
-def entries(n, wanted):
+def entries(wanted):
 
     tocompute = needed(TARGETS, wanted)
 
@@ -181,10 +186,11 @@ if __name__ == '__main__':
                     setattr(namespace, nskey, val)
 
     parser = argparse.ArgumentParser(description='Generate count table for polyominoes.')
-    parser.add_argument('order', metavar='n', type=int,
-                        help='maximum order in the table')
     parser.add_argument('-f', '--format', required=True, choices=('csv', 'md'),
             help='table format', action=FormatAction)
+
+    parser.add_argument('--min-order', type=int, default=0, help='minimum order in the table')
+    parser.add_argument('--max-order', type=int, help='maximum order in the table')
 
     parser.add_argument('--format-sep', help='separator for table format')
     parser.add_argument('--format-title', help='title format for table')
@@ -198,4 +204,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     arguments = vars(args)
-    main(args.order, **arguments)
+    main(**arguments)

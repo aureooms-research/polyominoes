@@ -8,11 +8,12 @@ Enumeration of Polyominoes
 [![GitHub issues](https://img.shields.io/github/issues/aureooms-research/polyominoes.svg)](https://github.com/aureooms-research/polyominoes/issues)
 
 ```py
-pypy3 table.py 13 -f md
+pypy3 table.py --format md --max-order 13
 ```
 
   |                                          order |              [fixed](https://oeis.org/A001168) |          [one-sided](https://oeis.org/A000988) |               [free](https://oeis.org/A000105) |             [chiral](https://oeis.org/A030228) | [free without holes](https://oeis.org/A000104) |            [A217595](https://oeis.org/A217595) |
   | ---------------------------------------------- | ---------------------------------------------- | ---------------------------------------------- | ---------------------------------------------- | ---------------------------------------------- | ---------------------------------------------- | ---------------------------------------------- |
+  |                                              0 |                                              1 |                                              1 |                                              1 |                                              0 |                                              1 |                                              1 |
   |                                              1 |                                              1 |                                              1 |                                              1 |                                              0 |                                              1 |                                              1 |
   |                                              2 |                                              2 |                                              1 |                                              1 |                                              0 |                                              1 |                                              0 |
   |                                              3 |                                              6 |                                              2 |                                              2 |                                              0 |                                              2 |                                              1 |
