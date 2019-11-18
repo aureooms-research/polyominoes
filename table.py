@@ -66,12 +66,20 @@ def main (
         format_endline=CSV['endline'],
         format_hline=CSV['hline'],
         format_linkify=CSV['linkify'],
+        show_intermediate=False,
         **options
     ) :
 
-    ncols = len(columns)
-
     wanted = frozenset(columns)
+    tocompute = needed(TARGETS, columns)
+    debug('tocompute', tocompute)
+
+    if show_intermediate:
+        wanted = frozenset(tocompute.keys())
+        tocompute = needed(TARGETS, wanted)
+        columns = list(filter(wanted.__contains__, COLUMNS))
+
+    ncols = len(columns)
 
     if format_linkify:
         titles = list(map(lambda column: column if column not in links else '[{}]({})'.format(column, links[column]), columns))
@@ -92,7 +100,7 @@ def main (
 
     # entries
 
-    events = entries(wanted)
+    events = entries(wanted, tocompute)
 
     _cache = {}
 
@@ -121,15 +129,9 @@ def main (
         put(format_endline)
         put('\n')
 
-def entries(wanted):
-
-    tocompute = needed(TARGETS, wanted)
-
-    debug('tocompute', tocompute)
+def entries(wanted, tocompute):
 
     it = _fixed()
-
-    # use defaultdict for default answer
 
     _cache = {}
 
@@ -198,7 +200,9 @@ if __name__ == '__main__':
     parser.add_argument('--format-newline', help='newline for table format')
     parser.add_argument('--format-endline', help='endline for table format')
     parser.add_argument('--format-hline', help='hline filler for table format')
-    parser.add_argument('--format-linkify', type=bool, help='enable links in table header')
+    parser.add_argument('--format-linkify', action='store_true', help='enable links in table header')
+
+    parser.add_argument('--show-intermediate', action='store_true', help='also print columns for intermediate computations')
 
     parser.add_argument('--columns', nargs='+', default=COLUMNS, choices=COLUMNS, help='columns of the table')
 
