@@ -5,6 +5,7 @@ from filter import filter_one_sided
 from filter import filter_free
 from filter import filter_without_holes
 from filter import _filter_with_odd_side_lengths
+from count import cardinality
 from online import links
 from scheduling import needed
 
@@ -50,9 +51,6 @@ TARGETS = {
     'free without holes': ['free'],
     'A217595': ['free without holes'],
 }
-
-def cardinality ( iterable ) :
-    return sum(map(lambda x: 1, iterable))
 
 def put ( x ) :
     print(x, end='', flush=True)
@@ -129,11 +127,12 @@ def entries(n, wanted):
         if 'order' in wanted:
             yield (i, 'order', i)
 
-        fixed_set = next(it)
+        if 'fixed' in tocompute:
+            fixed_set = next(it)
 
-        if 'fixed' in wanted:
-            fixed_len = len(fixed_set)
-            yield (i, 'fixed', fixed_len)
+            if 'fixed' in wanted:
+                fixed_len = len(fixed_set)
+                yield (i, 'fixed', fixed_len)
 
         if 'one-sided' in tocompute:
             one_sided_set = filter_one_sided(fixed_set)
