@@ -4,9 +4,19 @@ from grid import _neighbors_from_direction
 from polyomino import mino_key
 from debug import debug
 
+def _filter_chiral(minos):
+
+    for mino in minos:
+
+        if mino == mino.reflect_vert(): continue
+        if mino == mino.reflect_horiz(): continue
+        if mino == mino.reflect_diag(): continue
+        if mino == mino.reflect_skew(): continue
+
+        yield mino
+
 def filter_chiral(minos):
-    # TODO
-    return minos
+    return list(_filter_chiral(minos))
 
 def filter_one_sided(minos, sort=True):
 

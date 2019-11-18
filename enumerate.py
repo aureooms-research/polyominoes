@@ -1,6 +1,7 @@
 from polyomino import Polyomino
 from filter import filter_free
 from filter import filter_one_sided
+from filter import filter_chiral
 from filter import filter_with_holes
 from filter import filter_without_holes
 from filter import filter_with_odd_side_lengths
@@ -71,6 +72,21 @@ def one_sided(n):
     """
 
     return filter_one_sided(fixed(n))
+
+def chiral(n):
+
+    """
+
+        >>> from oeis import A030228
+        >>> all(map(lambda n: len(chiral(n)) == A030228[n], range(1,8)))
+        True
+
+        For a(4)=2, the two chiral tetrominoes are XXX and XX .
+                                                   X        XX
+
+    """
+
+    return filter_chiral(free(n))
 
 def with_holes(n):
 

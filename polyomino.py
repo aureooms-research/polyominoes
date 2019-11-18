@@ -117,6 +117,14 @@ class Polyomino(frozenset):
                 self.rotate_half(),
                 self.rotate_right()]
 
+    def reflections(self):
+        """Return reflections of this mino."""
+        return [self,
+                self.reflect_vert(),
+                self.reflect_horiz(),
+                self.reflect_diag(),
+                self.reflect_skew()]
+
     def transforms(self):
         """Return transformations of this mino."""
         return [self,

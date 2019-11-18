@@ -1,5 +1,6 @@
 from itertools import count
 from enumerate import _fixed
+from filter import filter_chiral
 from filter import filter_one_sided
 from filter import filter_free
 from filter import filter_without_holes
@@ -35,6 +36,7 @@ COLUMNS = (
     "fixed",
     "one-sided",
     "free",
+    "chiral",
     "free without holes",
     "A217595"
 )
@@ -43,6 +45,7 @@ TARGETS = {
     'order': [],
     'fixed': [],
     'one-sided': ['fixed'],
+    'chiral': ['free'],
     'free': ['fixed'],
     'free without holes': ['free'],
     'A217595': ['free without holes'],
@@ -145,6 +148,13 @@ def entries(n, wanted):
             if 'free' in wanted:
                 free_len = len(free_set)
                 yield (i, 'free', free_len)
+
+        if 'chiral' in tocompute:
+            chiral_set = filter_chiral(free_set)
+
+            if 'chiral' in wanted:
+                chiral_len = len(chiral_set)
+                yield (i, 'chiral', chiral_len)
 
         if 'free without holes' in tocompute:
             free_without_holes_set = filter_without_holes(free_set)
