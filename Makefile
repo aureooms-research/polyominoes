@@ -5,3 +5,6 @@ check:
 
 test:
 	python -m doctest -v *.py
+
+env:
+	virtualenv -p $(shell which pypy3) .env
