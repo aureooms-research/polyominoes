@@ -41,7 +41,9 @@ pypy3 table.py --format md --max-order 13
 
 With `virtualenv` activated:
 
-    pypy3 -m vmprof -- table.py ...
+    pypy3 -m vmprof -o profiler.log -- table.py ...
+
+    vmprofshow --prune-percent 3 profiler.log | less -r
 
 ## Related
 
