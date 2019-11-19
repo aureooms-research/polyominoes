@@ -29,6 +29,11 @@ pypy3 table.py --format md --max-order 13
   |                                             13 |                                        1903890 |                                         476270 |                                         238591 |                                         237679 |                                         217117 |                                            710 |
 
 
+## Related
+
+  - https://web.archive.org/web/20070423213531/http://www.ieeta.pt/%7Etos/animals/a44.html
+  - https://web.archive.org/web/20070501082433/http://www-cs-faculty.stanford.edu/~knuth/programs.html (POLYNUM, POLYSLAVE)
+
 ## Credits
 
 The code was originally derived from
