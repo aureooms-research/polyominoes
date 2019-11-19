@@ -15,7 +15,7 @@ def mino_key(m):
     """
     #Sort the mino by order, then shape, then 'closeness to top'
     h, w = m.shape
-    return (m.order, h, w, sum(2**(i+j*w) for i, j in m))
+    return (m.order, h, w, sum(2**(i+j*h) for i, j in m))
 
 ##@total_ordering
 class Polyomino(frozenset):
@@ -61,7 +61,7 @@ class Polyomino(frozenset):
         """Width and height of a mino"""
         if self:
             rows, cols = zip(*self)
-            return -min(rows)+max(rows)+1, -min(rows)+max(cols)+1
+            return -min(rows)+max(rows)+1, -min(cols)+max(cols)+1
         else:
             return (0,0)
     @property

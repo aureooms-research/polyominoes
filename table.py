@@ -15,13 +15,17 @@ COLUMNS = (
     "order",
     "fixed",
     "one-sided",
+    "one-sided mem",
     "free",
+    "free mem",
     "chiral",
     "free without holes",
+    "free without holes mem",
     "fixed without holes",
     "A217595",
     "A217595 fixed",
     "A217595 mem",
+    "A217595 mem 2",
 )
 
 LONGEST_COLUMN_TITLE = max(map(len, COLUMNS))

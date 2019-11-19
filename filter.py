@@ -17,13 +17,10 @@ def _filter_chiral(minos):
 
         yield mino
 
-def filter_chiral(minos):
-    return list(_filter_chiral(minos))
-
 def _filter_one_sided(minos, sort=True):
 
     """
-        Remove rotations in set of minos.
+        Remove rotations in set of minos (with history).
     """
 
     vis = set() # visited mino rotation families
@@ -36,11 +33,24 @@ def _filter_one_sided(minos, sort=True):
             # Add the (maximal rotation of the) mino
             yield max(mino_rots, key=mino_key) if sort else mino
 
-def filter_one_sided(minos, sort=True):
-    return list(_filter_one_sided(minos,sort=sort))
+def _filter_one_sided_mem(minos):
+
+    """
+        Remove rotations in set of minos (without history).
+
+        hyp: minos has no duplicates
+    """
+
+    for mino in minos:
+        mino_rots = mino.rotations()
+        # If this mino is maximum amoung its rotations, output it
+        if mino == max(mino_rots, key=mino_key):
+            yield mino
 
 def _filter_free(minos, sort=True):
-    """Remove rotations and reflections in the set of minos."""
+    """
+        Remove rotations and reflections in the set of minos (with history).
+    """
     vis = set() # visited transformation families
     for mino in minos:
         # If we haven't seen a rotation or reflection of this mino before,
@@ -51,15 +61,22 @@ def _filter_free(minos, sort=True):
             # Add the (maximal transform of the) mino
             yield max(mino_trans, key=mino_key) if sort else mino
 
-def filter_free(minos, sort=True):
-    return frozenset(_filter_free(minos,sort=sort))
-
-
-def _filter_without_holes ( minos ) :
+def _filter_free_mem(minos):
 
     """
-    Check if outside of polyomino is connected. If not there is a hole.
+        Remove rotations and reflections in the set of minos (without history).
+
+        hyp: minos has no duplicates
     """
+
+    for mino in minos:
+        mino_trans = mino.transforms()
+        # If this mino is maximum amoung its transformations, output it
+        if mino == max(mino_trans, key=mino_key):
+            yield mino
+
+
+def _filter_holes ( condition , minos ) :
 
     for mino in minos:
 
@@ -69,16 +86,24 @@ def _filter_without_holes ( minos ) :
 
         antimino = whole_grid - mino
 
-        if is_connected(antimino): yield mino
+        if condition(antimino): yield mino
 
-def filter_without_holes ( minos ) :
-    return frozenset(_filter_without_holes(minos))
+
+def _filter_without_holes ( minos ) :
+
+    """
+        Check if outside of polyomino is connected. If not, there is a hole.
+    """
+
+    return _filter_holes(is_connected, minos)
 
 def _filter_with_holes ( minos ) :
-    yield from filter_with_holes( minos )
 
-def filter_with_holes ( minos ) :
-    return minos.difference(filter_without_holes(minos))
+    """
+        Check if outside of polyomino is disconnected. If it is, there is no hole.
+    """
+
+    return _filter_holes(lambda x : not is_connected(x), minos)
 
 def _filter_with_odd_side_lengths ( minos ):
 
@@ -107,6 +132,3 @@ def _filter_with_odd_side_lengths ( minos ):
             yield mino
 
         debug('#####################################')
-
-def filter_with_odd_side_lengths ( minos ):
-    return list(_filter_with_odd_side_lengths(minos))

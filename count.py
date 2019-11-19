@@ -32,7 +32,7 @@ def free(n):
 
     """
 
-    return len(enumerate.free(n))
+    return cardinality(enumerate._free_mem(n))
 
 def one_sided(n):
 
@@ -44,7 +44,7 @@ def one_sided(n):
 
     """
 
-    return len(enumerate.one_sided(n))
+    return cardinality(enumerate._one_sided_mem(n))
 
 def chiral(n):
 
@@ -56,7 +56,7 @@ def chiral(n):
 
     """
 
-    return len(enumerate.chiral(n))
+    return cardinality(enumerate._chiral_mem(n))
 
 def with_holes(n):
 
@@ -68,7 +68,7 @@ def with_holes(n):
 
     """
 
-    return len(enumerate.with_holes(n))
+    return cardinality(enumerate._with_holes_mem(n))
 
 def without_holes(n):
 
@@ -80,7 +80,7 @@ def without_holes(n):
 
     """
 
-    return len(enumerate.without_holes(n))
+    return cardinality(enumerate._without_holes_mem(n))
 
 
 def free_without_holes_with_odd_side_length(n):
@@ -93,4 +93,4 @@ def free_without_holes_with_odd_side_length(n):
 
     """
 
-    return len(enumerate.free_without_holes_with_odd_side_length(n))
+    return cardinality(enumerate._free_without_holes_with_odd_side_length_mem(n))

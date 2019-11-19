@@ -1,10 +1,12 @@
 from polyomino import Polyomino
-from filter import filter_free
-from filter import filter_one_sided
-from filter import filter_chiral
-from filter import filter_with_holes
-from filter import filter_without_holes
-from filter import filter_with_odd_side_lengths
+from filter import _filter_free
+from filter import _filter_free_mem
+from filter import _filter_one_sided
+from filter import _filter_one_sided_mem
+from filter import _filter_chiral
+from filter import _filter_with_holes
+from filter import _filter_without_holes
+from filter import _filter_with_odd_side_lengths
 from grid import neighbors
 
 def _redelmeier_routine(p, parent, untried, forbidden):
@@ -31,10 +33,9 @@ def _redelmeier_routine(p, parent, untried, forbidden):
 
             yield from _redelmeier_routine(p-1, child, untried + new_neighbours, forbidden)
 
-def _redelmeier(p):
+def _redelmeier(n):
 
-    yield from _redelmeier_routine(p, Polyomino([]), [(0,0)], frozenset())
-
+    return _redelmeier_routine(n, Polyomino([]), [(0,0)], frozenset())
 
 def childset(minos):
 
@@ -59,13 +60,13 @@ def _fixed_with_init(minos):
         yield minos
         minos = childset(minos)
 
-def _fixed():
+def _fixed_gen():
 
     """
         Enumerate the fixed k-ominoes for all k >= 0.
 
         >>> from oeis import A001168
-        >>> it = _fixed()
+        >>> it = _fixed_gen()
         >>> all(map(lambda n: len(next(it)) == A001168[n], range(8)))
         True
 
@@ -75,6 +76,8 @@ def _fixed():
     init = {Polyomino([])}
 
     yield from _fixed_with_init(init)
+
+_fixed = _redelmeier
 
 def fixed(n):
 
@@ -86,7 +89,13 @@ def fixed(n):
 
     """
 
-    return frozenset(_redelmeier(n))
+    return frozenset(_fixed(n))
+
+def _free_mem(n):
+    return _filter_free_mem(_fixed(n))
+
+def _free(n):
+    return _filter_free(_fixed(n))
 
 def free(n):
 
@@ -98,7 +107,13 @@ def free(n):
 
     """
 
-    return filter_free(fixed(n))
+    return frozenset(_free(n))
+
+def _one_sided_mem(n):
+    return _filter_one_sided_mem(_fixed(n))
+
+def _one_sided(n):
+    return _filter_one_sided(_fixed(n))
 
 def one_sided(n):
 
@@ -110,7 +125,13 @@ def one_sided(n):
 
     """
 
-    return filter_one_sided(fixed(n))
+    return frozenset(_one_sided(n))
+
+def _chiral_mem(n):
+    return _filter_chiral(_free_mem(n))
+
+def _chiral(n):
+    return _filter_chiral(_free(n))
 
 def chiral(n):
 
@@ -125,7 +146,13 @@ def chiral(n):
 
     """
 
-    return filter_chiral(free(n))
+    return frozenset(_chiral(n))
+
+def _with_holes(n):
+    return _filter_with_holes(_free(n))
+
+def _with_holes_mem(n):
+    return _filter_with_holes(_free_mem(n))
 
 def with_holes(n):
 
@@ -137,7 +164,13 @@ def with_holes(n):
 
     """
 
-    return filter_with_holes(free(n))
+    return frozenset(_with_holes(n))
+
+def _without_holes(n):
+    return _filter_without_holes(_free(n))
+
+def _without_holes_mem(n):
+    return _filter_without_holes(_free_mem(n))
 
 def without_holes(n):
 
@@ -149,8 +182,14 @@ def without_holes(n):
 
     """
 
-    return filter_without_holes(free(n))
+    return frozenset(_without_holes(n))
 
+
+def _free_without_holes_with_odd_side_length(n):
+    return _filter_with_odd_side_lengths(_without_holes(n))
+
+def _free_without_holes_with_odd_side_length_mem(n):
+    return _filter_with_odd_side_lengths(_without_holes_mem(n))
 
 def free_without_holes_with_odd_side_length(n):
 
@@ -162,4 +201,4 @@ def free_without_holes_with_odd_side_length(n):
 
     """
 
-    return filter_with_odd_side_lengths(without_holes(n))
+    return frozenset(_free_without_holes_with_odd_side_length(n))
