@@ -29,6 +29,20 @@ pypy3 table.py --format md --max-order 13
   |                                             13 |                                        1903890 |                                         476270 |                                         238591 |                                         237679 |                                         217117 |                                            710 |
 
 
+## Dev
+
+### Using `virtualenv`
+
+    make env
+    source .env/bin/activate.fish
+    pip install vmprof
+
+### Profiling
+
+With `virtualenv` activated:
+
+    pypy3 -m vmprof -- table.py ...
+
 ## Related
 
   - https://web.archive.org/web/20070423213531/http://www.ieeta.pt/%7Etos/animals/a44.html
