@@ -198,10 +198,17 @@ if __name__ == '__main__':
                 if getattr(namespace, nskey) is None:
                     setattr(namespace, nskey, val)
 
+    class OrderAction(argparse.Action):
+        def __call__(self, parser, namespace, values, option_string=None):
+            setattr(namespace, self.dest, values)
+            setattr(namespace, 'min_{}'.format(self.dest), values)
+            setattr(namespace, 'max_{}'.format(self.dest), values)
+
     parser = argparse.ArgumentParser(description='Generate count table for polyominoes.')
     parser.add_argument('-f', '--format', required=True, choices=('csv', 'md'),
             help='table format', action=FormatAction)
 
+    parser.add_argument('--order', type=int, action=OrderAction, help='order for the single row to compute')
     parser.add_argument('--min-order', type=int, default=0, help='minimum order in the table')
     parser.add_argument('--max-order', type=int, help='maximum order in the table')
 
