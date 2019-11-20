@@ -10,18 +10,20 @@ from grid import translate
 from grid import _translate
 from grid import normalize
 from functools import lru_cache
+from functools import total_ordering
 
 @lru_cache(maxsize=10000)
+def _mino_key(n, h, w, cells):
+    #Sort the mino by order, then shape, then 'closeness to top'
+    return (n, h, w, sum(2**(i+j*h) for i, j in cells))
+
 def mino_key(m):
     """
         Generate a standard key for a polyomino.
     """
-    #Sort the mino by order, then shape, then 'closeness to top'
-    h = m.height
-    w = m.width
-    return (m.order, h, w, sum(2**(i+j*h) for i, j in m.cells))
+    return _mino_key(m.order, m.height, m.width, m.cells)
 
-##@total_ordering
+@total_ordering
 class Polyomino:
 
     """
@@ -79,6 +81,9 @@ class Polyomino:
             Equality to another mino.
         """
         return self.cells.__eq__(other.cells)
+
+    def __lt__(self, other):
+        return mino_key(self) < mino_key(other)
 
     # [properties]
 

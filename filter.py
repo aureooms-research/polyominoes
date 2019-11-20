@@ -32,7 +32,7 @@ def _filter_one_sided(minos, sort=True):
             mino_rots = mino.rotations()
             vis.update(mino_rots)
             # Add the (maximal rotation of the) mino
-            yield max(mino_rots, key=mino_key) if sort else mino
+            yield max(mino_rots) if sort else mino
 
 def _filter_one_sided_mem(minos):
 
@@ -43,10 +43,11 @@ def _filter_one_sided_mem(minos):
     """
 
     for mino in minos:
-        mino_rots = mino.rotations()
+        if mino < mino.rotate_left(): continue
+        if mino < mino.rotate_half(): continue
+        if mino < mino.rotate_right(): continue
         # If this mino is maximum amoung its rotations, output it
-        if mino is max(mino_rots, key=mino_key):
-            yield mino
+        yield mino
 
 def _filter_free(minos, sort=True):
     """
@@ -60,7 +61,7 @@ def _filter_free(minos, sort=True):
             mino_trans = mino.transforms()
             vis.update(mino_trans)
             # Add the (maximal transform of the) mino
-            yield max(mino_trans, key=mino_key) if sort else mino
+            yield max(mino_trans) if sort else mino
 
 def _filter_free_mem(minos):
 
@@ -71,10 +72,18 @@ def _filter_free_mem(minos):
     """
 
     for mino in minos:
-        mino_trans = mino.transforms()
+
+        if mino < mino.rotate_left(): continue
+        if mino < mino.rotate_half(): continue
+        if mino < mino.rotate_right(): continue
+
+        if mino < mino.reflect_vert(): continue
+        if mino < mino.reflect_horiz(): continue
+        if mino < mino.reflect_diag(): continue
+        if mino < mino.reflect_skew(): continue
+
         # If this mino is maximum amoung its transformations, output it
-        if mino is max(mino_trans, key=mino_key):
-            yield mino
+        yield mino
 
 @lru_cache(maxsize=None)
 def whole_grid ( h, w ) :
