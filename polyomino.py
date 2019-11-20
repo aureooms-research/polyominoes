@@ -6,41 +6,67 @@ https://raw.githubusercontent.com/tesseralis/polyomino/master/polyomino.py
 """
 # from functools import total_ordering
 from grid import _neighbors
+from grid import translate
+from grid import _translate
+from grid import normalize
+from functools import lru_cache
 
-## TODO: Figure out how to have the same effect WITHIN the class
-## using __eq__, __gt__, __lt__, etc
+@lru_cache(maxsize=10000)
 def mino_key(m):
     """
         Generate a standard key for a polyomino.
     """
     #Sort the mino by order, then shape, then 'closeness to top'
-    h, w = m.shape
-    return (m.order, h, w, sum(2**(i+j*h) for i, j in m))
+    h = m.height
+    w = m.width
+    return (m.order, h, w, sum(2**(i+j*h) for i, j in m.cells))
 
 ##@total_ordering
-class Polyomino(frozenset):
+class Polyomino:
 
     """
         Represent a fixed polyomino in space as a set of point tuples.
+
+        hyp: cells is a frozenset
     """
 
+    def __init__(self, cells, height=None, width=None):
+
+        self.cells = cells
+
+        if height is None or width is None:
+            if cells:
+                rows, cols = zip(*cells)
+                if height is None: height = max(rows)+1
+                if width is None: width = max(cols)+1
+            else:
+                if height is None: height = 0
+                if width is None: width = 0
+
+        self.height = height
+        self.width = width
+
     def grid(self):
-        """Return boolean-grid representation of this polyomino."""
+
+        """
+            Return boolean-grid representation of this polyomino.
+        """
+
         # Create a blank grid in the shape of the mino
-        h, w = self.shape
+        h = self.height
+        w = self.width
         grid = [[False]*w for row in range(h)]
         # Fill the grid with the values in the mino
-        for i, j in self:
+        for i, j in self.cells:
             grid[i][j] = True
         return grid
 
     def __hash__(self):
-        # Just inherit superclass's hashing
-        return super().__hash__()
+        return self.cells.__hash__()
 
     def __str__(self, cell="[]", empty="  "):
         """
-        Pretty string of the polyomino.
+            Pretty string of the polyomino.
         """
         grid = self.grid()
         result = []
@@ -50,82 +76,60 @@ class Polyomino(frozenset):
 
     def __eq__(self, other):
         """
-        Equality to another mino.
+            Equality to another mino.
         """
-        return super().__eq__(other)
+        return self.cells.__eq__(other.cells)
 
     # [properties]
-    # TODO: Make O(1), pre-storage?
-    @property
-    def shape(self):
-        """Width and height of a mino"""
-        if self:
-            rows, cols = zip(*self)
-            return -min(rows)+max(rows)+1, -min(cols)+max(cols)+1
-        else:
-            return (0,0)
-    @property
-    def width(self):
-        return self.shape[1]
-    @property
-    def height(self):
-        return self.shape[0]
 
     @property
     def order(self):
-        return len(self)
+        return len(self.cells)
 
     @property
     def origin(self):
-        for i in range(len(self)):
-            if (0,i) in self:
+        for i in range(len(self.cells)):
+            if (0,i) in self.cells:
                 return (0,i)
 
-    # [transformations]
+    @property
     def corner(self):
-        if not self:
+        if not self.cells:
             return (0,0)
-        rows, cols = zip(*self)
+        rows, cols = zip(*self.cells)
         return (min(rows), min(cols))
-
-    def normalize(self):
-        """
-        Return a polyomino in normal form (min x,y is zero)
-        """
-        imin, jmin = self.corner()
-        return self.translate(-imin, -jmin)
 
     def translate(self, numrows, numcols):
         """Translate by numrows and numcols"""
-        return Polyomino((i+numrows, j+numcols) for i, j in self)
+        return Polyomino(translate(self.cells, numrows, numcols), self.height, self.width)
 
     def rotate_left(self):
         """Rotate counterclockwise"""
-        return Polyomino((-j, i) for i, j in self).normalize()
+        return Polyomino(normalize([(-j, i) for i, j in self.cells]), self.width, self.height)
 
     def rotate_half(self):
         """Rotate 180 degrees"""
-        return Polyomino((-i, -j) for i, j in self).normalize()
+        return Polyomino(normalize([(-i, -j) for i, j in self.cells]), self.height, self.width)
 
     def rotate_right(self):
         """Rotate clockwise"""
-        return Polyomino((j, -i) for i, j in self).normalize()
+        return Polyomino(normalize([(j, -i) for i, j in self.cells]), self.width, self.height)
 
     def reflect_vert(self):
         """Reflect vertically"""
-        return Polyomino((-i, j) for i, j in self).normalize()
+        return Polyomino(normalize([(-i, j) for i, j in self.cells]), self.height, self.width)
 
     def reflect_horiz(self):
         """Reflect horizontally"""
-        return Polyomino((i, -j) for i, j in self).normalize()
+        return Polyomino(normalize([(i, -j) for i, j in self.cells]), self.height, self.width)
 
     def reflect_diag(self):
         """Reflection across line i==j"""
-        return Polyomino((j, i) for i, j in self)
+        return Polyomino(frozenset((j, i) for i, j in self.cells), self.width, self.height)
 
     def reflect_skew(self):
         """Reflection across line i==-j"""
-        return Polyomino((-j, -i) for i, j in self).normalize()
+        return Polyomino(normalize([(-j, -i) for i, j in self.cells]), self.width, self.height)
 
     # [Congruent polyominoes]
     def rotations(self):
@@ -154,60 +158,54 @@ class Polyomino(frozenset):
                 self.reflect_diag(),
                 self.reflect_skew()]
 
-    # TODO: more "pythonic" way of keeping track of symmetry?
-    def symmetry(self):
+    def augment(self, cell):
+
         """
-        Return the symmetry sigil of the polyomino.
-        '?': No symmetries
-        '|-\/': Reflective symmetry across axis
-        '%': Twofold rotational symmetry
-        '@': Fourfold rotational symmetry
-        '+X': Twofold reflective symmetry
-        'O': All symmetries
+            hyp: cell is a neighbour of self
         """
-        sym = ''
-        if self == self.reflect_horiz():
-            sym += '|'
-        if self == self.reflect_vert():
-            sym += '-'
-        if self == self.reflect_diag():
-            sym += '\\'
-        if self == self.reflect_skew():
-            sym += '/'
-        if self == self.rotate_half():
-            sym += '%'
-        if self == self.rotate_left():
-            sym += '@'
-        if '|-' in sym:
-            sym += '+'
-        if '\\/' in sym:
-            sym += 'X'
-        if '@+X' in sym:
-            sym += 'O'
-        if not sym:
-            sym = '?'
-        return sym
+
+        cells = self.cells
+        height = self.height
+        width = self.width
+
+        if cell[0] == height:
+            height += 1
+        elif cell[1] == width:
+            width += 1
+        elif cell[0] == -1:
+            height += 1
+            cells = _translate(cells, 1, 0)
+            cell = (0, cell[1])
+        elif cell[1] == -1:
+            width += 1
+            cells = _translate(cells, 0, 1)
+            cell = (cell[0], 0)
+
+        newcells = frozenset(cells) | {cell}
+
+        return Polyomino(newcells, height, width)
+
+    def neighbours(self):
+
+        nbrs = set()
+
+        for cell in self.cells: nbrs.update(_neighbors(cell))
+
+        return nbrs - self.cells
+
 
     def children(self):
         """
         Returns all polyominoes obtained by adding a square to this one.
         """
-        if not self:
-            return frozenset([Polyomino([(0,0)])])
+        if not self.cells: return {singleton}
 
         childset = set()
-        # Get all the neighbors of all the cells
-        nbrs = set()
-        for square in self:
-            nbrs.update(_neighbors(square))
-        nbrs -= self
         # Add each neighbor
-        for nbr in nbrs:
-            new = Polyomino(self | {nbr})
-            # Only normalize if we need to
-            if nbr[0] == -1:
-                new = new.translate(1, 0)
-            elif nbr[1] == -1:
-                new = new.translate(0, 1)
+        for nbr in self.neighbours():
+            new = self.augment(nbr)
             childset.add(new)
         return childset
+
+empty = Polyomino(frozenset(), 0, 0)
+singleton = Polyomino(frozenset([(0,0)]), 1, 1)

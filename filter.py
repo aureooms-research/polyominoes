@@ -1,4 +1,5 @@
 from itertools import chain
+from functools import lru_cache
 from grid import is_connected
 from grid import boundary
 from grid import corners
@@ -75,19 +76,24 @@ def _filter_free_mem(minos):
         if mino == max(mino_trans, key=mino_key):
             yield mino
 
+@lru_cache(maxsize=None)
+def whole_grid ( h, w ) :
+    return set((x,y) for x in range(-1,h+1) for y in range(-1,w+1))
+
+@lru_cache(maxsize=None)
+def has_topological_property ( condition ) :
+
+    def _cnd ( mino ) :
+
+        antimino = whole_grid(mino.height, mino.width) - mino.cells
+
+        return condition(antimino)
+
+    return _cnd
 
 def _filter_holes ( condition , minos ) :
 
-    for mino in minos:
-
-        h, w = mino.shape
-
-        whole_grid = set((x,y) for x in range(-1,h+1) for y in range(-1,w+1))
-
-        antimino = whole_grid - mino
-
-        if condition(antimino): yield mino
-
+    return filter(has_topological_property(condition), minos)
 
 def _filter_without_holes ( minos ) :
 
@@ -113,9 +119,9 @@ def _filter_with_odd_side_lengths ( minos ):
         debug('=========')
         debug(mino)
         debug('=========')
-        debug(frozenset(mino))
+        debug(mino.cells)
 
-        b = boundary(mino)
+        b = boundary(mino.cells, mino.origin)
 
         debug(b)
 

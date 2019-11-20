@@ -1,6 +1,26 @@
 from collections import Counter
 from debug import debug
 
+def _translate(cells, numrows, numcols):
+    return ((i+numrows, j+numcols) for i, j in cells)
+
+def translate(cells, numrows, numcols):
+    return frozenset(_translate(cells, numrows, numcols))
+
+def normalize ( cells ) :
+
+    """
+        Return a set of cells in normal form (min x,y is zero).
+        Assumes cells is a collection (list, set, frozenset, ...).
+    """
+
+    if not cells: return frozenset()
+
+    rows, cols = zip(*cells)
+    imin, jmin = min(rows), min(cols)
+
+    return translate(cells, -imin, -jmin)
+
 def neighbors(cell):
 
     """
@@ -69,17 +89,16 @@ def _neighbors_from_direction(neighbor, cell):
         yield (i-1, j)
 
 
-def is_connected ( cells ) :
+def is_connected ( todo ) :
 
-    it = iter(cells)
+    """
+        todo is a set (also works with lists but with worse complexity)
+    """
 
     try:
-        first = next(it)
-    except StopIteration:
+        queue = [todo.pop()]
+    except KeyError:
         return True
-
-    todo = set(it)
-    queue = [first]
 
     while queue:
 
@@ -94,30 +113,32 @@ def is_connected ( cells ) :
     return not todo
 
 
-def boundary_cells ( mino ):
+def boundary_cells ( cells ):
 
     """
         Returns cells of the boundary of the input polyomino.
     """
 
-    kill_count = Counter(chain(*[_neighbors(cell) for cell in mino]))
+    kill_count = Counter(chain(*[_neighbors(cell) for cell in cells]))
 
     debug("kill_count", kill_count)
 
     killed = map(lambda t: t[0], filter(lambda t: t[1] == 4, kill_count.items()))
 
-    return mino.difference(killed)
+    return cells.difference(killed)
 
 
-def boundary ( mino ):
+def boundary ( cells, origin ):
 
     """
         Returns boundary of the input polyomino (clockwise).
     """
 
-    if len(mino) == 0: return []
+    n = len(cells)
 
-    if len(mino) == 1: return [(0,0), (0,1), (1,1), (1,0)]
+    if n == 0: return []
+
+    if n == 1: return [(0,0), (0,1), (1,1), (1,0)]
 
     # xxxxxx
     # ^ x
@@ -125,16 +146,14 @@ def boundary ( mino ):
     #   xxx
     #  xx
 
-    n = len(mino)
-
-    first = mino.origin
+    first = origin
 
     debug("first", first)
 
     # those are coordinates of the lattice
 
     previous = first
-    if (first[0],first[1]+1) in mino:
+    if (first[0],first[1]+1) in cells:
         boundary = [(first[0],first[1]+1)]
         second = (first[0],first[1]+1)
     else:
@@ -160,7 +179,7 @@ def boundary ( mino ):
                 y = boundary[-1][1] + neighbor[1] - current[1]
                 boundary.append((x,y))
 
-            if neighbor in mino:
+            if neighbor in cells:
                 previous = current
                 current = neighbor
                 break

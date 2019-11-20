@@ -1,4 +1,5 @@
 from polyomino import Polyomino
+from polyomino import empty
 from filter import _filter_free
 from filter import _filter_free_mem
 from filter import _filter_one_sided
@@ -8,13 +9,14 @@ from filter import _filter_with_holes
 from filter import _filter_without_holes
 from filter import _filter_with_odd_side_lengths
 from grid import neighbors
+from grid import normalize
 
 def _redelmeier_routine(p, parent, untried, forbidden):
 
     # todo use lifo linked list / stack implementation for untried
 
     if p == 0:
-        yield parent.normalize()
+        yield Polyomino(normalize(parent))
 
     else:
 
@@ -22,7 +24,7 @@ def _redelmeier_routine(p, parent, untried, forbidden):
 
             nbr = untried.pop()
 
-            child = Polyomino(parent | {nbr})
+            child = parent | {nbr}
 
             new_neighbours = list(filter(
                     lambda x : x not in parent and x not in forbidden and ((x[1] >= 0 and x[0] >= 0) or x[1] >= 1),
@@ -35,7 +37,7 @@ def _redelmeier_routine(p, parent, untried, forbidden):
 
 def _redelmeier(n):
 
-    return _redelmeier_routine(n, Polyomino([]), [(0,0)], frozenset())
+    return _redelmeier_routine(n, frozenset(), [(0,0)], frozenset())
 
 def childset(minos):
 
@@ -72,10 +74,7 @@ def _fixed_gen():
 
     """
 
-    # The one zeromino
-    init = {Polyomino([])}
-
-    yield from _fixed_with_init(init)
+    return _fixed_with_init({empty})
 
 _fixed = _redelmeier
 
