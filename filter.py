@@ -1,10 +1,8 @@
-from itertools import chain
 from functools import lru_cache
 from grid import is_connected
 from grid import boundary
 from grid import corners
 from grid import _boundary_lengths
-from polyomino import mino_key
 from debug import debug
 
 def _filter_chiral(minos):
