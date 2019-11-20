@@ -51,6 +51,24 @@ def _neighbors(cell):
     yield (i, j-1)
     yield (i-1, j)
 
+def _legal_neighbors(cell):
+
+    """
+
+        Get upper, right, lower, left neighbors of this cell, in that order,
+        with extra condition ((x[1] >= 0 and x[0] >= 0) or x[1] >= 1)
+
+        >>> list(_legal_neighbors((7,5)))
+        [(7, 6), (8, 5), (7, 4), (6, 5)]
+
+    """
+
+    i, j = cell
+    yield (i, j+1)
+    yield (i+1, j)
+    if j > 1 or (j == 1 and i >= 0): yield (i, j-1)
+    if j > 0 or (j == 0 and i > 0): yield (i-1, j)
+
 
 def _neighbors_from_direction(neighbor, cell):
 

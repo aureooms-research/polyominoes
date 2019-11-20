@@ -8,8 +8,10 @@ from filter import _filter_chiral
 from filter import _filter_with_holes
 from filter import _filter_without_holes
 from filter import _filter_with_odd_side_lengths
-from grid import neighbors
+from grid import _legal_neighbors
 from grid import normalize
+from lifo import PersistentStack
+from lifo import lifo
 
 def _redelmeier_routine(p, parent, untried, forbidden):
 
@@ -22,22 +24,26 @@ def _redelmeier_routine(p, parent, untried, forbidden):
 
         while untried:
 
-            nbr = untried.pop()
+            untried, nbr = untried.pop()
 
-            child = parent | {nbr}
+            candidates = set(_legal_neighbors(nbr))
 
-            new_neighbours = list(filter(
-                    lambda x : x not in parent and x not in forbidden and ((x[1] >= 0 and x[0] >= 0) or x[1] >= 1),
-                    neighbors(nbr).difference(untried)
-            ))
+            candidates.difference_update(untried, forbidden)
 
-            forbidden = forbidden.union([nbr])
+            new_neighbours = filter(
+                lambda x : x not in parent,
+                candidates
+            )
 
-            yield from _redelmeier_routine(p-1, child, untried + new_neighbours, forbidden)
+            forbidden = forbidden.add(nbr)
+
+            parent.add(nbr)
+            yield from _redelmeier_routine(p-1, parent, untried.extend(new_neighbours), forbidden)
+            parent.remove(nbr)
 
 def _redelmeier(n):
 
-    return _redelmeier_routine(n, frozenset(), [(0,0)], frozenset())
+    return _redelmeier_routine(n, set(), lifo([(0,0)]), PersistentStack())
 
 def childset(minos):
 
