@@ -45,7 +45,7 @@ def _filter_one_sided_mem(minos):
     for mino in minos:
         mino_rots = mino.rotations()
         # If this mino is maximum amoung its rotations, output it
-        if mino == max(mino_rots, key=mino_key):
+        if mino is max(mino_rots, key=mino_key):
             yield mino
 
 def _filter_free(minos, sort=True):
@@ -73,7 +73,7 @@ def _filter_free_mem(minos):
     for mino in minos:
         mino_trans = mino.transforms()
         # If this mino is maximum amoung its transformations, output it
-        if mino == max(mino_trans, key=mino_key):
+        if mino is max(mino_trans, key=mino_key):
             yield mino
 
 @lru_cache(maxsize=None)
