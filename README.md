@@ -45,6 +45,10 @@ With `virtualenv` activated:
 
     vmprofshow --prune-percent 3 profiler.log | less -r
 
+Upload to vmprof.com
+
+    python -m vmprof.upload --web-auth ... profiler.log
+
 ## Related
 
   - https://web.archive.org/web/20070423213531/http://www.ieeta.pt/%7Etos/animals/a44.html
