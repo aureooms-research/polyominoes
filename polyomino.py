@@ -9,6 +9,8 @@ from grid import _neighbors
 from grid import translate
 from grid import _translate
 from grid import normalize
+from format import draw_grid
+from format import to_repr
 from functools import lru_cache
 from functools import total_ordering
 
@@ -48,38 +50,40 @@ class Polyomino:
         self.height = height
         self.width = width
 
-    def grid(self):
-
-        """
-            Return boolean-grid representation of this polyomino.
-        """
-
-        # Create a blank grid in the shape of the mino
-        h = self.height
-        w = self.width
-        grid = [[False]*w for row in range(h)]
-        # Fill the grid with the values in the mino
-        for i, j in self.cells:
-            grid[i][j] = True
-        return grid
-
     def __hash__(self):
         return self.cells.__hash__()
 
-    def __str__(self, cell="[]", empty="  "):
+    def __repr__(self):
         """
-            Pretty string of the polyomino.
+
+            >>> repr(empty)
+            'Polyomino(frozenset(), height=0, width=0)'
+
+            >>> repr(singleton)
+            'Polyomino(frozenset({(0, 0)}), height=1, width=1)'
+
+            >>> eval(repr(empty)) == empty
+            True
+
+            >>> eval(repr(singleton)) == singleton
+            True
+
         """
-        grid = self.grid()
-        result = []
-        for row in grid:
-            result.append("".join(cell if c else empty for c in row))
-        return '\n'.join(result)
+        return to_repr(self)
+
+    def __str__(self):
+        """
+
+            >>> str(empty)
+            ''
+
+            >>> str(singleton)
+            '[]'
+
+        """
+        return draw_grid(self)
 
     def __eq__(self, other):
-        """
-            Equality to another mino.
-        """
         return self.cells.__eq__(other.cells)
 
     def __lt__(self, other):
