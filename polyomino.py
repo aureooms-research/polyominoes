@@ -7,7 +7,6 @@ https://raw.githubusercontent.com/tesseralis/polyomino/master/polyomino.py
 # from functools import total_ordering
 from grid import _neighbors
 from grid import translate
-from grid import _translate
 from grid import normalize
 from format import draw_grid
 from format import to_repr
@@ -183,16 +182,14 @@ class Polyomino:
             width += 1
         elif cell[0] == -1:
             height += 1
-            cells = _translate(cells, 1, 0)
+            cells = translate(cells, 1, 0)
             cell = (0, cell[1])
         elif cell[1] == -1:
             width += 1
-            cells = _translate(cells, 0, 1)
+            cells = translate(cells, 0, 1)
             cell = (cell[0], 0)
 
-        newcells = frozenset(cells) | {cell}
-
-        return Polyomino(newcells, height, width)
+        return Polyomino(cells | {cell}, height, width)
 
     def neighbours(self):
 
